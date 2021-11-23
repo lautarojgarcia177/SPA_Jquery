@@ -56,7 +56,7 @@ class ProductView {
     }
     //METHOD FOR CREATING THE PRODUCT LISTING VIEW
     listProducts(parent, data, callback) {
-        let html = '';
+        let html = '<p>Total money spent: <strong>$</strong><strong id="total-money-spent">0</strong></p>';
         for (const product of data) {
             html += `<div>
                         <input value="${product.id}" type="hidden">
@@ -72,7 +72,7 @@ class ProductView {
     searchProduct(padre, callback) {
         $(padre).html(`
             <section>
-                <h1>SEARCH PRODUCT</h1>
+                <h1>SEARCH PRODUCT BY ID</h1>
                 <input type ="number">
                 <button id="btnSearch">Search</button>
             </section>
@@ -96,6 +96,22 @@ class ProductController {
                 name: children[1].value,
                 price: children[2].value,
             });
+            // DISPLAY CONFIRMATION TO USER
+            $(app).append(`
+                <div class="product-added">
+                    <h4>Product added:</h4>
+                    <p>id: ${this.productModel.products.length + 1}</p>
+                    <p>name: ${children[1].value}</p>
+                    <p>price: ${children[2].value}</p>
+                </div>
+            `);
+            setTimeout(function() {
+                $(".product-added").remove();
+            }, 2000);
+            // RESET THE FORM
+            for (let child of children) {
+                child.value = null;
+            }
         });
     }
     //METHOD TO GENERATE CHECK THE VIEW, MODEL AND EVENT WHEN LISTING PRODUCTS
@@ -105,6 +121,7 @@ class ProductController {
             (event) => {
                 let children = $(event.target).parent().children();
                 console.log(children[0].value);
+                $('#total-money-spent')[0].innerHTML = Number($('#total-money-spent')[0].innerHTML) + Number(children[0].value);
             });
     }
     //METHOD TO GENERATE CHECK THE VIEW, MODEL AND EVENT WHEN LOOKING FOR A PRODUCT
@@ -114,6 +131,15 @@ class ProductController {
             let id = parseInt(children[1].value);
             let found = this.productModel.searchProduct(id);
             console.log(found);
+            $('.product-found').remove();
+            $(app).append(`
+                <div class="product-found">
+                    <h4>Product found:</h4>
+                    <p>id: ${found.id}</p>
+                    <p>name: ${found.name}</p>
+                    <p>price: ${found.price}</p>
+                </div>
+            `);
         });
     }
 }
